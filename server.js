@@ -15,9 +15,9 @@ app.use(express.json());
 
 app.post('/todos', async (req, res) => {
     try {
-        const { description } = req.body;
-        const newTodo = await pool.query("INSERT INTO todo (description) VALUES($1) RETURNING *",
-            [description]);
+        const { description, completed } = req.body;
+        const newTodo = await pool.query("INSERT INTO todo (description, completed) VALUES($1, $2) RETURNING *",
+            [description, completed]);
         
         res.json(newTodo.rows[0])
         
@@ -60,10 +60,10 @@ app.get('/todos/:id', async(req, res) => {
 app.put('/todos/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { description } = req.body;
+        const { description, completed } = req.body;
          const updateTodo = await pool.query(
-            'UPDATE todo SET description = $1 WHERE todo_id = $2',
-            [description, id]
+            'UPDATE todo SET description = $1, completed = $2 WHERE todo_id = $3',
+            [description, completed, id]
         );
 
         res.json(`Todo with id ${id} was updated`);
