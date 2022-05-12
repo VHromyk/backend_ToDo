@@ -12,3 +12,9 @@ CREATE TABLE todo(
 -- ADD COLUMN TO THE TABLE
 
 ALTER TABLE todo ADD completed BOOLEAN NOT NULL DEFAULT false;
+
+
+CREATE TABLE user(
+  todo_id SERIAL PRIMARY KEY,
+  description VARCHAR(255)
+);
