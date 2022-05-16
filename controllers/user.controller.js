@@ -1,11 +1,14 @@
 const pool = require('../db');
+const bcrypt = require('bcrypt');
 
 const createUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newTodo = await pool.query(
             'INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *',
-            [name, email, password]
+            [name, email, hashedPassword]
         );
 
         res.json(newTodo.rows[0]);
@@ -26,9 +29,10 @@ const getUsers = async (req, res) => {
 
 const getUsersById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const todo = await pool.query('SELECT * FROM todos WHERE id = $1', [
-            id,
+        const { userId } = req.params;
+
+        const todo = await pool.query('SELECT * FROM users WHERE id = $1', [
+            userId,
         ]);
 
         res.json(todo.rows);

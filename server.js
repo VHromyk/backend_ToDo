@@ -1,36 +1,42 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const pool = require('./db');
-const {createUser, getUsers, getUsersById, removeUserById } = require('./controllers/user.controller');
+const express = require('express')
+const app = express()
+const cors = require('cors')
 const {
-    getAllTodos,
-    getTodoById,
-    getTodosByUserId,
-    createTodoForCurrentUser,
-    updateTodoById,
-    deleteTodoById
-} = require('./controllers/todo.controller');
+  createUser,
+  getUsers,
+  getUsersById,
+  removeUserById
+} = require('./controllers/user.controller')
+const {
+  getAllTodos,
+  getTodoById,
+  getTodosByUserId,
+  createTodoForCurrentUser,
+  updateTodoById,
+  deleteTodoById
+} = require('./controllers/todo.controller')
 
-const PORT = 5000;
+const userRouter = require('./routes/users.router')
+const authRouter = require('./routes/auth.router');
+
+require('dotenv').config()
+
+const PORT = process.env.PORT || 5000
 
 // middleware
-app.use(cors());
-app.use(express.json());
+
+const corsOptions = {
+  credentials: true,
+  origin: process.env.URL || '*'
+}
+app.use(cors(corsOptions))
+app.use(express.json())
 
 // ROUTES
 
-// create user
+app.use('/auth', authRouter);
 
-app.post('/users', createUser);
-
-// get all users
-
-app.get('/users', getUsers);
-
-// get user by Id
-
-app.get('/users/:userId', getUsersById);
+app.use('/users', userRouter)
 
 // create todo for current user
 
@@ -38,16 +44,11 @@ app.post('/users/:userId/todos', createTodoForCurrentUser)
 
 // get todos for currentUser
 
-app.get('/users/:userId/todos', getTodosByUserId);
-
-// remove user by Id
-
-app.delete('/users/:userId', removeUserById);
+app.get('/users/:userId/todos', getTodosByUserId)
 
 // get all todo
 
 app.get('/todos', getAllTodos)
-
 
 // get a todo
 
@@ -61,7 +62,6 @@ app.put('/todos/:id', updateTodoById)
 
 app.delete('/todos/:id', deleteTodoById)
 
-
 app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}...`);
-});
+  console.log(`Server is listening on port ${PORT}...`)
+})
