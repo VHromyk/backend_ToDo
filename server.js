@@ -18,6 +18,7 @@ const {
 
 const userRouter = require('./routes/users.router')
 const authRouter = require('./routes/auth.router');
+const todoRouter = require('./routes/todo.router');
 
 require('dotenv').config()
 
@@ -35,32 +36,10 @@ app.use(express.json())
 // ROUTES
 
 app.use('/auth', authRouter);
+app.use('/users', userRouter);
 
-app.use('/users', userRouter)
-
-// create todo for current user
-
-app.post('/users/:userId/todos', createTodoForCurrentUser)
-
-// get todos for currentUser
-
-app.get('/users/:userId/todos', getTodosByUserId)
-
-// get all todo
-
-app.get('/todos', getAllTodos)
-
-// get a todo
-
-app.get('/todos/:id', getTodoById)
-
-// update a todo
-
-app.put('/todos/:id', updateTodoById)
-
-// delete a todo
-
-app.delete('/todos/:id', deleteTodoById)
+app.use('/todos', todoRouter);
+app.use('/users', todoRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}...`)
