@@ -1,24 +1,11 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const {
-  createUser,
-  getUsers,
-  getUsersById,
-  removeUserById
-} = require('./controllers/user.controller')
-const {
-  getAllTodos,
-  getTodoById,
-  getTodosByUserId,
-  createTodoForCurrentUser,
-  updateTodoById,
-  deleteTodoById
-} = require('./controllers/todo.controller')
 
 const userRouter = require('./routes/users.router')
 const authRouter = require('./routes/auth.router');
 const todoRouter = require('./routes/todo.router');
+const cookieParser = require('cookie-parser');
 
 require('dotenv').config()
 
@@ -32,10 +19,12 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use(express.json())
+app.use(cookieParser())
 
 // ROUTES
 
-app.use('/auth', authRouter);
+app.use('/', authRouter);
+
 app.use('/users', userRouter);
 
 app.use('/todos', todoRouter);

@@ -1,22 +1,6 @@
 const pool = require('../db');
 const bcrypt = require('bcrypt');
 
-const createUser = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newTodo = await pool.query(
-            'INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *',
-            [name, email, hashedPassword]
-        );
-
-        res.json(newTodo.rows[0]);
-    } catch (error) {
-        console.error(error.message);
-    }
-};
-
 const getUsers = async (req, res) => {
     try {
         const allTodos = await pool.query('SELECT * FROM users');
@@ -55,4 +39,4 @@ const removeUserById = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUsersById, removeUserById };
+module.exports = { getUsers, getUsersById, removeUserById };
