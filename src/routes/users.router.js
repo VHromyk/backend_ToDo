@@ -10,7 +10,7 @@ const router = express.Router()
 
 // each route verifies over the middleware
 router.get('/', authenticateToken, getUsers);
-router.get('/:userId', authenticateToken, getUsersById)
-router.delete('/:userId', authenticateToken, removeUserById)
+router.get('/:userId', getUsersById)
+router.delete('/:userId', removeUserById)
 
 module.exports = router
