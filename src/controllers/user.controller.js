@@ -1,9 +1,8 @@
-const pool = require('../db');
-const bcrypt = require('bcrypt');
+const userService = require('../service/user-service');
 
 const getUsers = async (req, res) => {
     try {
-        const allTodos = await pool.query('SELECT * FROM users');
+        const allTodos = await userService.getAllUsers();
 
         res.json(allTodos.rows);
     } catch (error) {
@@ -15,9 +14,7 @@ const getUsersById = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        const todo = await pool.query('SELECT * FROM users WHERE id = $1', [
-            userId,
-        ]);
+        const todo = await userService.getOneUserById(userId);
 
         res.json(todo.rows);
     } catch (error) {
@@ -29,11 +26,9 @@ const removeUserById = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        const allTodos = await pool.query('DELETE FROM users WHERE id = $1', [
-            userId,
-        ]);
+        const user = await userService.removeOneUserById(userId);
 
-        res.json(allTodos.rows);
+        res.json({success: true, message: `User ${userId} was deleted`});
     } catch (error) {
         console.error(error.message);
     }
