@@ -13,10 +13,19 @@ const signUpUser = async (req, res) => {
             const { name, email, password } = req.body;
             const hashedPassword = await bcrypt.hash(password, 10);
    
-           const newTodo = await authService.signUp(name, email, hashedPassword);
+            const user = await authService.signUp(name, email, hashedPassword);
+
+            let token = tokenService.generateAccessToken(user.rows[0]);
+            
+            function userDTO({name, email}) {
+                return {
+                    user: { name, email },
+                    token: token
+                };
+            }
    
-           res.json(newTodo.rows[0]);
-           return res.redirect('http://localhost:3000/login');
+           res.status(201).json(userDTO(user.rows[0]));
+        //    return res.redirect('http://localhost:3000/login');
         }
      } catch (error) {
          console.error({error: error.message});
@@ -29,7 +38,7 @@ const loginUser = async (req, res) => {
 
         const user = await authService.login(email);
 
-        if (user.rows.length === 0) {
+        if (!user.rows.length) {
             // PASSWORD CHECK
             res.status(400).json({ error: 'Email is incorrect' });
         } else {
