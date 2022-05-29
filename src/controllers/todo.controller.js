@@ -1,10 +1,10 @@
-const pool = require('../db');
+const todoService = require('../service/todo-service');
 
 const getAllTodos = async (req, res) => {
     try {
-        const allTodos = await pool.query('SELECT * FROM todos');
+        const todos = await todoService.findAllTodos();
 
-        res.json(allTodos.rows);
+        res.json(todos.rows);
     } catch (error) {
         console.error(error.message);
     }
@@ -12,10 +12,8 @@ const getAllTodos = async (req, res) => {
 
 const getTodoById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const todo = await pool.query('SELECT * FROM todos WHERE id = $1', [
-            id,
-        ]);
+        const todo = await todoService.findTodoById(req.params.id);
+
         res.json(todo.rows);
     } catch (error) {
         console.error(error.message);
@@ -24,11 +22,7 @@ const getTodoById = async (req, res) => {
 
 const getTodosByUserId = async (req, res) => {
     try {
-        const { userId } = req.params;
-
-        const todo = await pool.query('SELECT * FROM users WHERE id = $1', [
-            userId,
-        ]);
+        const todo = await todoService.findTodosByUserId(req.params.userId);
 
         res.json(todo.rows);
     } catch (error) {
@@ -38,13 +32,13 @@ const getTodosByUserId = async (req, res) => {
 
 const createTodoForCurrentUser = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { description, completed } = req.body;
+        const credentionals = {
+            userId: req.params.userId,
+            description: req.body.description,
+            completed: req.body.completed
+        }
 
-        const newTodo = await pool.query(
-            'INSERT INTO todos (description, completed, user_id) VALUES($1, $2, $3) RETURNING *',
-            [description, completed, userId]
-        );
+        const newTodo = await todoService.createTodoByUserId(credentionals);
 
         res.json(newTodo.rows[0]);
     } catch (error) {
@@ -54,14 +48,15 @@ const createTodoForCurrentUser = async (req, res) => {
 
 const updateTodoById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { description, completed } = req.body;
-        const updateTodo = await pool.query(
-            'UPDATE todos SET description = $1, completed = $2 WHERE id = $3',
-            [description, completed, id]
-        );
+        const credentionals = {
+              id: req.params.id,
+              description: req.body.description,
+              completed: req.body.completed,
+        };
+        
+        const updatedTodo = await todoService.updateTodoById(credentionals);
 
-        res.json(`Todo with id ${id} was updated`);
+        res.json(`Todo with id ${credentionals.id} was updated`);
     } catch (error) {
         console.error(error.message);
     }
@@ -69,13 +64,9 @@ const updateTodoById = async (req, res) => {
 
 const deleteTodoById = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log(id);
-        const removeTodo = await pool.query('DELETE FROM todos WHERE id = $1', [
-            id,
-        ]);
+        const removeTodo = await todoService.findTodoAndRemove(req.params.id);
 
-        res.json(`Todo with id ${id} was removed`);
+        res.json(`Todo with id ${removeTodo.rows[0].id} was removed`);
     } catch (error) {
         console.error(error.message);
     }

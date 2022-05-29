@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt');
-const pool = require('../db')
-const tokenService = require('../service/token-service')
+const authService = require('../service/auth-service');
+const tokenService = require('../service/token-service');
 const { validationResult } = require('express-validator');
-
 
 const signUpUser = async (req, res) => {
     try {
@@ -14,10 +13,7 @@ const signUpUser = async (req, res) => {
             const { name, email, password } = req.body;
             const hashedPassword = await bcrypt.hash(password, 10);
    
-           const newTodo = await pool.query(
-               'INSERT INTO users (name, email, password) VALUES($1, $2, $3) RETURNING *',
-               [name, email, hashedPassword]
-            );
+           const newTodo = await authService.signUp(name, email, hashedPassword);
    
            res.json(newTodo.rows[0]);
            return res.redirect('http://localhost:3000/login');
@@ -31,10 +27,7 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await pool.query(
-            'SELECT * FROM users WHERE email=$1',
-            [email]
-      );
+        const user = await authService.login(email);
 
         if (user.rows.length === 0) {
             // PASSWORD CHECK
@@ -56,9 +49,6 @@ const loginUser = async (req, res) => {
 
              res.json(tokens);
       }
-     
-     
-      
     } catch (error) {
         res.status(401).json({error: error.message});
     }
@@ -82,21 +72,10 @@ const refreshToken = async (req, res) => {
         const { refreshToken } = req.cookies;
         if (!refreshToken)
             return res.status(401).json({ error: 'Null refresh token' });
-        jwt.verify(
-            refreshToken,
-            process.env.REFRESH_TOKEN_SECRET,
-            (error, user) => {
-                if (error)
-                    return res.status(403).json({ error: error.message });
-                let tokens = tokenService.generateTokens(user);
-                // We safe refresh-token into the coockie
-                // Http only because we are not allowet to change cookies by JS
-                res.cookie('refreshToken', tokens.refreshToken, {
-                    httpOnly: true,
-                });
-                res.json(tokens);
-            }
-        );
+        
+        const tokens = tokenService.refreshToken(refreshToken);
+
+        res.json(tokens)
     } catch (error) {
         res.status(401).json({ message: error.message });
     }

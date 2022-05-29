@@ -1,18 +1,11 @@
 const pool = require('../db');
 
-const getAllUsers = () => {
-  return pool.query('SELECT * FROM users');
-};
+const getAllUsers = () => pool.query('SELECT * FROM users');
 
-const getOneUserById = (userId) => {
-  return pool.query('SELECT * FROM users WHERE id = $1', [userId]);
-}
+const getOneUserById = (userId) => pool.query('SELECT * FROM users WHERE id = $1', [userId]);
 
-const removeOneUserById = (userId) => {
-  return pool.query('DELETE FROM users WHERE id = $1', [
-            userId,
-        ])
-}
+const removeOneUserById = (userId) => pool.query('DELETE FROM users WHERE id = $1', [userId]);
+
 
 
 const userService = {
