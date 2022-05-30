@@ -15,12 +15,12 @@ const signUpUser = async (req, res) => {
    
             const user = await authService.signUp(name, email, hashedPassword);
 
-            let token = tokenService.generateAccessToken(user.rows[0]);
+            let token = tokenService.generateTokens(user.rows[0]);
             
             function userDTO({name, email}) {
                 return {
                     user: { name, email },
-                    token: token
+                    token: token.accessToken,
                 };
             }
    
@@ -36,7 +36,7 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await authService.login(email);
+        const user = await authService.login(email, password);
 
         if (!user.rows.length) {
             // PASSWORD CHECK
@@ -55,8 +55,15 @@ const loginUser = async (req, res) => {
              res.cookie('refreshToken', tokens.refreshToken, {
                  httpOnly: true,
              });
+            
+              function userDTO({ name, email }) {
+                  return {
+                      user: { name, email },
+                      token: tokens.accessToken,
+                  };
+              }
 
-             res.json(tokens);
+             res.status(200).json(userDTO(user.rows[0]));
       }
     } catch (error) {
         res.status(401).json({error: error.message});

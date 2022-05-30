@@ -2,15 +2,7 @@ const jwt = require('jsonwebtoken');
 
 
 class TokenService {
-  generateAccessToken({ id, name, email }) {
-    const user = { id, name, email };
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '30m',
-    });
-    return accessToken;
-  }
-  
-  generateTokens({ id, name, email }) {
+    generateTokens({ id, name, email }) {
       const user = { id, name, email };
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
           expiresIn: '30m',
