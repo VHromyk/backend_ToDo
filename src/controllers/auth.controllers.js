@@ -40,7 +40,9 @@ const loginUser = async (req, res) => {
 
         if (!user.rows.length) {
             // PASSWORD CHECK
-            res.status(400).json({ error: 'Email is incorrect' });
+            res.status(400).json({
+                error: 'Password or email are not correct',
+            });
         } else {
              const isPassEquals = await bcrypt.compare(
                  password,
@@ -49,16 +51,16 @@ const loginUser = async (req, res) => {
              if (!isPassEquals)
                  return res
                      .status(401)
-                     .json({ error: 'Password is incorrect' });
+                     .json({ error: 'Password or email are not correct' });
              // JWT
              let tokens = tokenService.generateTokens(user.rows[0]);
              res.cookie('refreshToken', tokens.refreshToken, {
                  httpOnly: true,
              });
             
-              function userDTO({ name, email }) {
+              function userDTO({ id, name, email }) {
                   return {
-                      user: { name, email },
+                      user: { id, name, email },
                       token: tokens.accessToken,
                   };
               }
