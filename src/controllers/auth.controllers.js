@@ -75,15 +75,20 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
+        
+        if (!refreshToken) return res.status(401).json({ message: 'User unauthorizated' });
 
-        res.clearCookie(refreshToken);
+        // const token = await authService.logout(refreshToken)
 
-        return res.status(200).json({message: `Refresh token was deleted`});
+        res.clearCookie('refreshToken');
 
+
+        return res.status(200).json({ message: `Refresh token was deleted` });
     } catch (error) {
         res.status(401).json({ error: error.message });
     }
-}
+};
+
 
 const refreshToken = async (req, res) => {
     try {

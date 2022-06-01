@@ -3,7 +3,7 @@ const userService = require('../service/user-service');
 const getUsers = async (req, res) => {
     try {
         const allTodos = await userService.getAllUsers();
-
+        
         res.json(allTodos.rows);
     } catch (error) {
         console.error(error.message);
@@ -34,4 +34,21 @@ const removeUserById = async (req, res) => {
     }
 };
 
-module.exports = { getUsers, getUsersById, removeUserById };
+const getCurrentUser = async (req, res) => {
+    try {
+        const currentUser = await req.user;
+
+        console.log(req);
+
+        if (!currentUser) return res.status(401).json({message: `User is not authorizated`})
+
+        res.status(200).json({
+            success: true,
+            user: currentUser,
+        });
+    } catch (error) {
+        res.status(401).json({ error: error.message });
+    }
+};
+
+module.exports = { getUsers, getUsersById, removeUserById, getCurrentUser };

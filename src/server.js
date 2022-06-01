@@ -23,7 +23,7 @@ app.use(cookieParser())
 
 // ROUTES
 
-app.use('/', authRouter);
+app.use('/auth', authRouter);
 
 app.use('/users', userRouter);
 

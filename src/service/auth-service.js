@@ -8,6 +8,7 @@ const signUp = (name, email, hashedPass) => pool.query(
 const login = (email) => pool.query('SELECT * FROM users WHERE email=$1', [email]);
 
 
+
 const authService = {
   signUp,
   login

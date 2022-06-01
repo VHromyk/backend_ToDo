@@ -5,7 +5,7 @@ class TokenService {
     generateTokens({ id, name, email }) {
       const user = { id, name, email };
       const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-          expiresIn: '30m',
+          expiresIn: '3m',
       });
       const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
           expiresIn: '30d',
